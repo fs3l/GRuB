@@ -10,7 +10,6 @@ pragma experimental ABIEncoderV2;
       take replication action according the counter value;
     - Replication action:
       The upper bound of counter to trigger the replication action is K.
-      The lower bound to invalidate the local record is 0;
 */
 
 contract onChainCounters{
@@ -54,7 +53,8 @@ contract onChainCounters{
     function digest(string memory key, string memory value) public {
         Digest[key] = keccak256(bytes(value));
         IsLocal[key] = false;
-        Counters[key] -= X;
+        
+        Counters[key] = Counters[key]>=X?Counters[key]-X:0;
     }
     
     function getCounter(string memory key) view public returns(uint8, bool) {
