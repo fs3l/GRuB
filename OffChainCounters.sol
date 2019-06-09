@@ -1,51 +1,71 @@
 pragma solidity ^0.5.0;
 pragma experimental ABIEncoderV2;
 
-/*
-  Store the counters off chain
-  Algorithm:
-    - DU issues a read request.
-    - SP upload the record and attach the replication decision.
-        - if it is replicate, store the record on-chain.
-    - DO issues a write, to update the hash and invalidate the on-chain replica.
-*/
-
-contract offChainCounters{
+contract GRuB_SS_OffChain{
     
-    mapping (string=>bytes32) Digest;
+    bytes32 root_hash;
     mapping (string=>string) Replica;
-    mapping (string=>bool) IsLocal;
+    mapping (string=>bool) Valid;
     
-    event response(string, string);
-    event request(string);
     
-    // DU issues a read
-    function get(string memory key) public returns(string memory) {
-        if (IsLocal[key]) {
-            string memory res = Replica[key];
-            return res;
-        }else{
-            emit request(key); 
+    // prev: R, R -> R
+    function read(string[] memory keys) public payable returns(string[] memory) {
+        string[] memory rets = new string[](keys.length);
+        
+        for (uint8 i=0; i<keys.length; ++i){
+                rets[i] = Replica[keys[i]];
         }
+        return rets;
     }
     
-    // SP uploads one record, and the replication decision;
-    function upload(string memory key, string memory value, bool replicate) public {
-        if (Digest[key] == keccak256(bytes(value)))
-        {
-            if (replicate){
-                 Replica[key] = value;
-                 IsLocal[key] = true;
-            }else{
-                 emit response(key,value);
+    // prev: NR
+    function read_offchain(string[] memory keys, string[] memory values, bool[] memory cur,  bytes32[] memory path) public {
+        for(uint8 i=0; i<keys.length; ++i){
+            // authenticate the proof
+            bytes32  computedHash;      
+            for(uint8 j=0; j<path.length; ++j){
+                computedHash = keccak256(abi.encodePacked(computedHash, path[j]));
+            }
+            
+            if (root_hash == computedHash)
+            {
+                //here we do nothing, just to simulate the real-world cost through the if clause.
+            }
+            
+            // NR -> R
+            if (cur[i]) {
+                Replica[keys[i]] = values[i];
+                Valid[keys[i]] = true;
+            }
+            // NR -> NR, do nothing
+            else{
+                
+            }
+        }
+        
+        // notify DU through event
+        // emit event()
+    }
+    
+    function write(string[] memory keys, string[] memory values, bool[] memory prev, bool[] memory cur, bytes32 digest) public {
+        root_hash = digest;
+        
+        for (uint8 i=0; i<keys.length; ++i){
+            // prev: R
+            if (prev[i]) {
+                
+                // R -> R, replicate
+                if (cur[i]) {
+                    Replica[keys[i]] = values[i];
+                }
+                // R -> NR, invalidate old version
+                else{
+                    Valid[keys[i]] = false;
+                }
+            }
+            // prev: NR,  NR -> NR, do nothing
+            else{
             }
         }
     }
-    
-    // DO updates the digest of a data key, invalidate the local record
-    function digest(string memory key, string memory value) public {
-        Digest[key] = keccak256(bytes(value));
-        IsLocal[key] = false;
-    }
-    
 }
