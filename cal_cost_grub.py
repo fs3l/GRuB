@@ -6,8 +6,9 @@ cost = [41158, 37324, 40241, 27375] # W, R_OFF_NOREPLICATE, R_OFF_REPLICATE, R_O
 counter={}
 replica={}
 
-# whenever a write is issued, reset the counter to be 0
-def reset(_key):
+# whenever a write is issued, decrease the counter by X
+def decreaseCounter(_key):
+	#TODO 
 	counter[_key] = 0
 	replica[_key] = False 
 
@@ -33,16 +34,20 @@ def replicate_decision(_key):
 def calculate(_key, _write, _total_cost):
 	if (_write):
 		_total_cost += cost[0] # W
-		reset(_key);
+		#TODO batching the writes 
+		decreaseCounter(_key);
 	else:
 		if read_offchain(_key):
 			if not replicate_decision(_key):
 				_total_cost += cost[1] #R_OFF_NOREPLICATE
+				#TODO batching the reads that served in off-chain 
 			else:
 				_total_cost += cost[2] #R_OFF_REPLICATE
+				#TODO batching the reads that served in off-chain 
 		else:
 			print "R_ON"
 			_total_cost += cost[3]         #R_ON
+			#TODO batching the reads that served in on-chain 
 	return _total_cost
 
 def scan(_FILE):
@@ -59,6 +64,9 @@ def scan(_FILE):
 			write = False
 		total_cost = calculate(key, write, total_cost)
 	print total_cost
+	#TODO send writes-batched transaction  
+	#TODO send off-chain read-batched transaction  
+	#TODO send on-chain read-batched transaction  
         FILE.close()
 
 ##################
