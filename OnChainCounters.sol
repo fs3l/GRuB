@@ -3,18 +3,18 @@ pragma experimental ABIEncoderV2;
 
 contract GRuB_SS_OnChain{
     
-    uint8 K = 3;  // upperbound of counter to replication  
-    uint8 X = 1;  // decrement of counter by an update to an object
+    int8 K = 4;  // upperbound of counter to replication  
+    int8 X = 1;  // decrement of counter by an update to an object
     
     bytes32 root_hash;
     mapping (string=>string) Replica;
     mapping (string=>bool) Valid;
-    mapping (string=>uint8) Counters;
+    mapping (string=>int8) Counters;
     
     // DU sends batched reads
-    function read(string[] memory keys) public payable returns(string[] memory) {
+    function read(string[142] memory keys) public payable returns(string[142] memory) {
         
-        string[] memory rets = new string[](keys.length);
+        string[142] memory rets;
         
         for (uint8 i=0; i<keys.length; ++i){
             // prev: R
@@ -33,8 +33,10 @@ contract GRuB_SS_OnChain{
     }
     
     // SP uploads the requested objects, SS will replicates the record according to the current counter value
-    function read_offchain(string[] memory keys, string[] memory values, bytes32[] memory path) public {
-        
+    function read_offchain(string[142] memory keys, string[142] memory values, bytes32[10] memory path) public payable returns(string[142] memory
+) {
+        string[142] memory rets;
+
         for(uint8 i=0; i<keys.length; ++i){
             // authenticate the proof
             bytes32  computedHash;      
@@ -52,6 +54,8 @@ contract GRuB_SS_OnChain{
                  Replica[keys[i]] = values[i];
                  Valid[keys[i]] = true;
             }
+            
+            rets[i] = values[i];
         }
         
         // notify DU through event
@@ -59,33 +63,41 @@ contract GRuB_SS_OnChain{
     }
     
     // DO call write() to submit the latest digest, SS will store the latest digest and invalidates part of the on-chain replicas. 
-    function write(string[] memory keys, string[] memory values, bytes32 digest) public {
+    function write(string[142] memory keys, string[142] memory values, bytes32 digest) public {
         
         root_hash = digest;
+        
         for (uint8 i=0; i<keys.length; ++i){
             // prev: R
-            if (Counters[keys[i]] >= K) {
-                
-                // decrease by X
-                 Counters[keys[i]] = Counters[keys[i]]-X;
-            
-                // cur: R, R -> R
+            if (Valid[keys[i]]) {
+                 
+                 // cur: R, R -> R
                 if (Counters[keys[i]] >= K) {
-                     Replica[keys[i]] = values[i];
-                }
-                // cur: NR, R -> NR
+                    Replica[keys[i]] = values[i];
+                }// cur: NR, R -> NR
                 else{
                     Valid[keys[i]] = false;
                 }
-            }
-            // prev: NR, NR -> NR
+                // decrease by X
+                Counters[keys[i]] -= X;
+                
+            }// prev: NR, NR -> NR
             else{
-                Counters[keys[i]] = (Counters[keys[i]]-X >=0)? Counters[keys[i]]-X:0;
+                  if (Counters[keys[i]] >= X) {
+                      Counters[keys[i]] -= X;
+                  }else{
+                      Counters[keys[i]] = 0;
+                }
             }
         }
     }
     
-    function getCounter(string memory key) public view returns(uint8) {
-        return Counters[key];
+    function pre_write(string[142] memory keys, string[142] memory values, bytes32 digest) public {
+        root_hash = digest;
+        for (uint8 i=0; i<keys.length; ++i){
+            Counters[keys[i]] = 0;
+            Replica[keys[i]]=values[i];
+            Valid[keys[i]] = false;
+        }
     }
 }

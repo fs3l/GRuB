@@ -9,8 +9,8 @@ contract GRuB_SS_OffChain{
     
     
     // prev: R, R -> R
-    function read(string[] memory keys) public payable returns(string[] memory) {
-        string[] memory rets = new string[](keys.length);
+    function read(string[142] memory keys) public payable returns(string[142] memory) {
+        string[142] memory rets;
         
         for (uint8 i=0; i<keys.length; ++i){
                 rets[i] = Replica[keys[i]];
@@ -19,8 +19,10 @@ contract GRuB_SS_OffChain{
     }
     
     // prev: NR
-    function read_offchain(string[] memory keys, string[] memory values, bool[] memory cur,  bytes32[] memory path) public {
-        for(uint8 i=0; i<keys.length; ++i){
+    function read_offchain(string[142] memory keys, string[142] memory values, bool[142] memory cur,  bytes32[10] memory path) public payable returns(string[142] memory) {
+        string[142] memory rets;
+
+        for(uint8 i=0; i<values.length; ++i){
             // authenticate the proof
             bytes32  computedHash;      
             for(uint8 j=0; j<path.length; ++j){
@@ -41,18 +43,24 @@ contract GRuB_SS_OffChain{
             else{
                 
             }
+            rets[i]=values[i];
         }
-        
+        return rets;
         // notify DU through event
         // emit event()
     }
     
-    function write(string[] memory keys, string[] memory values, bool[] memory prev, bool[] memory cur, bytes32 digest) public {
+    /* optimization 1: 
+       Instead of passing the previous decision from off-chain, we choose to read it from on-chain map Valid. This can reduce gas cost, 
+       and reduce the input size and further yield space to the other arguments.
+       See GetDecision.sol for the experiment conclusion.
+     */
+    function write(string[] memory keys, string[] memory values, bool[] memory cur, bytes32 digest) public {
         root_hash = digest;
         
         for (uint8 i=0; i<keys.length; ++i){
             // prev: R
-            if (prev[i]) {
+            if (Valid[keys[i]]) {
                 
                 // R -> R, replicate
                 if (cur[i]) {
@@ -66,6 +74,15 @@ contract GRuB_SS_OffChain{
             // prev: NR,  NR -> NR, do nothing
             else{
             }
+        }
+    }
+    
+    function pre_write(string[142] memory keys, string[142] memory values, bytes32 digest) public {
+     
+        root_hash = digest;
+        for (uint8 i=0; i<keys.length; ++i){
+            Replica[keys[i]] = values[i];
+            Valid[keys[i]] = true;
         }
     }
 }
