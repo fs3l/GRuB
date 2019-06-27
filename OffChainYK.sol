@@ -14,7 +14,7 @@ contract GRuB_SS_OffChain_InSecure_YK{
     mapping (string=>uint8) OnChainReadCounter;
     mapping (string=>uint8) OffChainReadCounter;
 
-    // On-chain read
+    // On-chain read entry
     function read(string[110] memory keys) public payable returns(string[110] memory) {
         string[110] memory rets;
         
@@ -26,7 +26,7 @@ contract GRuB_SS_OffChain_InSecure_YK{
         return rets;
     }
     
-    // Off-chain read
+    // Off-chain read entry
     function read_offchain(string[110] memory keys, string[110] memory values, uint8[110] memory WC, bytes32[10] memory path) public payable returns(string[110] memory) {
         string[110] memory rets;
 
@@ -47,6 +47,7 @@ contract GRuB_SS_OffChain_InSecure_YK{
                 // emit event();
             }
             
+            // prev: NR
             uint8 readcount = OnChainReadCounter[keys[i]] + OffChainReadCounter[keys[i]];
             if (WC[i] * Y + K <= readcount ) {
                 // new: R
@@ -54,7 +55,7 @@ contract GRuB_SS_OffChain_InSecure_YK{
                 Valid[keys[i]] = true;
             }
             else{
-                    // new: NR
+                // new: NR
             }
                 
             rets[i]=values[i];
@@ -65,11 +66,7 @@ contract GRuB_SS_OffChain_InSecure_YK{
         // emit event();
     }
     
-    /* optimization 1: 
-       Instead of passing the previous decision from off-chain, we choose to read it from on-chain map Valid. 
-       This can reduce gas cost and reduce the input size and further yield space to the other arguments,
-       See GetDecision.sol for the experiment conclusion.
-    */
+    // Write entry
     function write(string[110] memory keys, string[110] memory values, bool[110] memory earlyDecision, uint8[110] memory RC, uint8[110] memory WC, bytes32 digest) public {
         root_hash = digest;
         

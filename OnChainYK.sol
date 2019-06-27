@@ -57,12 +57,8 @@ contract GRuB_SS_OnChain_YK{
               // emit event
             }
             
-            // prev: R, cur must be R
-            if (Valid[keys[i]]) {
-                Replica[keys[i]] = values[i];
-            }
-            // prev: NR,   W*Y + K <= R cur: R
-            else if ( WCounters[keys[i]] + K <= RCounters[keys[i]] ){
+            //prev: NR,   W*Y + K <= R cur: R
+            if ( WCounters[keys[i]] + K <= RCounters[keys[i]] ){
                  Replica[keys[i]] = values[i];
                  Valid[keys[i]] = true;
             }
@@ -98,7 +94,7 @@ contract GRuB_SS_OnChain_YK{
                 }
             }
             
-            // prev: NR, then cur must be NR
+            // prev: NR, then cur must be NR as well
             else{
                  
             }
