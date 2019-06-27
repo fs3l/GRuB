@@ -35,10 +35,11 @@ contract Motivation{
                 computedHash = keccak256(abi.encodePacked(computedHash, proof[j]));
             }
             
+            if (computedHash != root) {}
+
             rets[i] = values[i];
         }
         
         return rets;
     }
 }
-

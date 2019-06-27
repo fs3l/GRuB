@@ -1,25 +1,25 @@
 #! /bin/bash
-for i in {1..110}
+for i in {1..164}
 do
    echo -n "\"1\","
 done
 echo ""
-for i in {1..110}
+for i in {1..164}
 do
    echo -n "\"$i\","
 done
 echo ""
-for i in {1..110}
+for i in {1..164}
 do
    echo -n "false,"
 done
 echo ""
-for i in {1..110}
+for i in {1..164}
 do
    echo -n "true,"
 done
 echo ""
-for i in {1..110}
+for i in {1..164}
 do
    echo -n "1,"
 done

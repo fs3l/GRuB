@@ -1,28 +1,26 @@
 pragma solidity ^0.5.0;
 pragma experimental ABIEncoderV2;
 
-contract GRuB_SS_OnChain{
+contract GRuB_SS_OnChain_Reset{
     
-    int8 K = 4;  // upperbound of counter to replication  
-    int8 X = 1;  // decrement of counter by an update to an object
-    
+    int8 K = 2;  // replicate threshold  
+
     bytes32 root_hash;
     mapping (string=>string) Replica;
     mapping (string=>bool) Valid;
     mapping (string=>int8) Counters;
     
-    // DU sends batched reads
-    function read(string[142] memory keys) public payable returns(string[142] memory) {
+    // Read entry 
+    function read(string[164] memory keys) public payable returns(string[164] memory) {
         
-        string[142] memory rets;
+        string[164] memory rets;
         
         for (uint8 i=0; i<keys.length; ++i){
-            // prev: R
+            // cur: R
             if (Valid[keys[i]]) {
                 rets[i] = Replica[keys[i]];
-                Counters[keys[i]]++;
             }
-            // prev: NR
+            // cur: NR
             else{
                 Counters[keys[i]]++;
                 // notify SP through event
@@ -32,10 +30,10 @@ contract GRuB_SS_OnChain{
         return rets;
     }
     
-    // SP uploads the requested objects, SS will replicates the record according to the current counter value
-    function read_offchain(string[142] memory keys, string[142] memory values, bytes32[10] memory path) public payable returns(string[142] memory
+    // Read off-chain entry
+    function read_offchain(string[164] memory keys, string[164] memory values, bytes32[10] memory path) public payable returns(string[164] memory
 ) {
-        string[142] memory rets;
+        string[164] memory rets;
 
         for(uint8 i=0; i<keys.length; ++i){
             // authenticate the proof
@@ -62,8 +60,8 @@ contract GRuB_SS_OnChain{
         // emit event()
     }
     
-    // DO call write() to submit the latest digest, SS will store the latest digest and invalidates part of the on-chain replicas. 
-    function write(string[142] memory keys, string[142] memory values, bytes32 digest) public {
+    // Write entry
+    function write(string[164] memory keys, string[164] memory values, bytes32 digest) public {
         
         root_hash = digest;
         
@@ -78,21 +76,18 @@ contract GRuB_SS_OnChain{
                 else{
                     Valid[keys[i]] = false;
                 }
-                // decrease by X
-                Counters[keys[i]] -= X;
                 
-            }// prev: NR, NR -> NR
+                
+            }// prev: NR
             else{
-                  if (Counters[keys[i]] >= X) {
-                      Counters[keys[i]] -= X;
-                  }else{
-                      Counters[keys[i]] = 0;
-                }
+                 
             }
+            // reset the counter
+            Counters[keys[i]] = 0;
         }
     }
     
-    function pre_write(string[142] memory keys, string[142] memory values, bytes32 digest) public {
+    function pre_write(string[164] memory keys, string[164] memory values, bytes32 digest) public {
         root_hash = digest;
         for (uint8 i=0; i<keys.length; ++i){
             Counters[keys[i]] = 0;
