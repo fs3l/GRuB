@@ -4,8 +4,8 @@ import pickle
 
 from lib.memoryless import initialize_state, insert_state, make_decision_for_read, make_decision_for_write
 from lib.utils import process, process_scan, order_by_decision, trim_by_decision
-from lib.testnet_smart_contract import PublicSmartContract
-from lib.local_smart_contract import PrivateSmartContract
+from lib.public_bkc import PublicSmartContract
+from lib.private_bkc import PrivateSmartContract
 from lib.pymerkletools import MerkleTools 
 
 ##################

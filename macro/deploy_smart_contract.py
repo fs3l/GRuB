@@ -9,7 +9,7 @@ from lib.local_smart_contract import PrivateSmartContract
 ##################
 
 if (len(sys.argv) < 2 ):
-	print ("Usage: ./deploy.py contract_code_file account_index(default=0)")
+	print ("Usage: ./deploy_smart_contract.py contract_code_file account_index(default=0)")
 	exit()
 
 code_file = sys.argv[1]
