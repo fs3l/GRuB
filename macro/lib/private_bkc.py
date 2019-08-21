@@ -16,9 +16,10 @@ class PrivateSmartContract(object):
         # web3.py instance
         self.w3 = Web3(Web3.HTTPProvider(self.rpcUrl))
 
-        # set ropsten funded account as sender
+        # set private (local) account as sender
         self.w3.eth.defaultAccount = self.w3.eth.accounts[account_index]
-        #self.w3.eth.personal.unlockAccount(self.w3.eth.defaultAccount, '', 1000000000)
+
+        # self.w3.eth.personal.unlockAccount(self.w3.eth.defaultAccount, '', 1000000000)
         self.account_index = account_index
 
     def getTransactionReceipt(self, tx_id):
