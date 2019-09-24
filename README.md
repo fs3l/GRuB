@@ -8,6 +8,7 @@ sudo pip3 install py-solc
 ```
 
 ## Test macrobenmark
+Make sure your Ethereum client (geth) is running and RPC is enabled.
 ```
 cd macro
 ```
