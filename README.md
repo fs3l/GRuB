@@ -4,9 +4,7 @@
 ### Install dependencies
 ```
 sudo pip3 install web3
-sudo add-apt-repository ppa:ethereum/ethereum
-sudo apt-get update
-sudo apt-get install solc
+sudo pip3 install py-solc
 ```
 
 ## Test macrobenmark
