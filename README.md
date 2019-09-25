@@ -1,6 +1,6 @@
 # Gas-­efficient State Replication on Blockchain with Workload Awareness
 
-## Preparition
+## Preparation
 ### Install dependencies
 ```
 sudo pip3 install web3
