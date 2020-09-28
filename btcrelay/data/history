@@ -1,0 +1,38 @@
+eth.accounts
+miner.start()
+eth.getBalance(eth.accounts[0])
+miner.stop()
+miner.start()
+miner.stop()
+eth.accounts
+miner.start()
+eth.getBalance(eth.accounts[0])
+miner.stop()
+Web3.version()
+web3.version
+eth.getBalance(eth.accounts[0])
+web3.version
+sudo apt-get install web3=1.0
+sudo apt-get install web3
+web3.version
+eth.accounts
+eth.getBalance(eth.accounts[0])
+var tx = {from: eth.accounts[0], to:eth.accounts[0], value:10}
+eth.getTransaction("0xb962970ec322eacd0a1a1d81865bc9db54e443d9ebcbf3a4be724e034b312fe5")
+eth.accounts
+admin.nodeInfo
+eth.blockNumber
+eth.accounts
+eth.getBalance(eth.accountsp0[)
+eth.getBalance(eth.accounts[0])
+miner.setEtherbase(eth.accounts[1])
+miner.start()
+eth.blockNumber
+miner.stop()
+eth.accounts
+miner.start()
+eth.blockNumber
+miner.stop()
+miner.start()
+miner.stop()
+miner.start()
