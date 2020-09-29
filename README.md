@@ -21,6 +21,14 @@ sudo add-apt-repository -y ppa:ethereum/ethereum
 sudo apt-get update
 sudo apt-get install ethereum
 ```
+
+##### Download GRuB
+```
+sudo apt-get install git
+git clone https://github.com/syracuse-fullstacksecurity/GRuB.git
+cd GRuB
+```
+
 ##### Run your private ethereum node (Don't close this process, start another process to do BtcRelay test)
 ```
 geth --datadir "geth_data" init genesis.json
