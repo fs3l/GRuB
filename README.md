@@ -11,7 +11,8 @@ http://mirrors.aliyun.com/ubuntu-releases/18.04.5/ubuntu-18.04.5-desktop-amd64.i
 sudo apt-get install python3.6
 sudo apt-get install python3-pip
 sudo pip3 install web3
-sudo pip3 install py-solc
+python3.6 -m solc.install v0.4.25
+sudo cp ~/.py-solc/solc-v0.4.25/bin/solc /usr/bin/solc
 ```
 
 ##### Install Geth
@@ -63,12 +64,6 @@ This step may take long time due to heavy merkle-tree computation.
 ```
 
 ### Trouble-shooting
-##### Sometimes the latest solc compiler(0.5.0+) maybe not compatible with web3.py, try the following:
-```
-python3.6 -m solc.install v0.4.25
-sudo cp ~/.py-solc/solc-v0.4.25/bin/solc /usr/bin/solc
-```
-
 ##### If you have multiple python3 versions, use the following commands to install Web3 and pysolc packages
 ```
 python3.6 -m pip install web3
