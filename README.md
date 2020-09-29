@@ -29,7 +29,7 @@ git clone https://github.com/syracuse-fullstacksecurity/GRuB.git
 cd GRuB
 ```
 
-##### Run your private ethereum node (Don't close this terminal)
+##### Run your private ethereum node (do not close this terminal)
 ```
 geth --datadir "geth_data" init genesis.json
 geth --datadir "geth_data" --rpc --allow-insecure-unlock --mine --minerthreads 1 --unlock "0x71ad2477b729741951b652aa7f9825e2f91f5a65" --password <(echo -n "") console 2>log
