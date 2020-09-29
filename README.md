@@ -29,16 +29,16 @@ git clone https://github.com/syracuse-fullstacksecurity/GRuB.git
 cd GRuB
 ```
 
-##### Run your private ethereum node (Don't close this process, start another process to do BtcRelay test)
+##### Run your private ethereum node (Don't close this terminal)
 ```
 geth --datadir "geth_data" init genesis.json
 geth --datadir "geth_data" --rpc --allow-insecure-unlock --mine --minerthreads 1 --unlock "0x71ad2477b729741951b652aa7f9825e2f91f5a65" --password <(echo -n "") console 2>log
 ```
 
-### Test BtcRelay trace
+### Test BtcRelay trace (start a new terminal)
 ##### Deploy smart contracts
 ```
-cd btcrelay
+cd GRuB/btcrelay
 ./deploy_contract.py contract/grub.sol
 ./deploy_contract.py contract/offchain.sol
 ./deploy_contract.py contract/onchain.sol
