@@ -1,7 +1,7 @@
 ## GRuB: Cost-Effective Data Feeds to Blockchains via Workload-Adaptive Data Replication
 
 ### Preparation
-##### Download Virtual Box and mirror from following address, and setup virtual ubuntu environment.
+##### Download Virtual Box and Ubuntu 18.04 ISO using the following link, and setup a virtual ubuntu environment.
 https://www.virtualbox.org/wiki/Downloads
 
 http://mirrors.aliyun.com/ubuntu-releases/18.04.5/ubuntu-18.04.5-desktop-amd64.iso
