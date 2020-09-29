@@ -16,7 +16,7 @@ sudo add-apt-repository -y ppa:ethereum/ethereum
 sudo apt-get update
 sudo apt-get install ethereum
 ```
-##### Run your private ethereum node
+##### Run your private ethereum node (Don't close this process, start another process to do BtcRelay test)
 ```
 geth --datadir "geth_data" init genesis.json
 geth --datadir "geth_data" --rpc --allow-insecure-unlock --mine --minerthreads 1 --unlock "0x71ad2477b729741951b652aa7f9825e2f91f5a65" --password <(echo -n "") console 2>log
@@ -46,7 +46,7 @@ This step may take long time due to heavy merkle-tree computation.
 
 ##### Run GRuB
 ```
-./driver_memoryless.py 10 1 trace/subtrace_1.data
+./driver_memoryless.py 10 1 trace/subtrace_1.data 0
 ```
 
 ### Trouble-shooting
