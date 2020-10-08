@@ -11,6 +11,8 @@ http://mirrors.aliyun.com/ubuntu-releases/18.04.5/ubuntu-18.04.5-desktop-amd64.i
 sudo apt-get install python3.6
 sudo apt-get install python3-pip
 sudo pip3 install web3
+sudo pip3 install py-solc
+sudo pip3 install sha3
 python3.6 -m solc.install v0.4.25
 sudo cp ~/.py-solc/solc-v0.4.25/bin/solc /usr/bin/solc
 ```
@@ -40,9 +42,9 @@ geth --datadir "geth_data" --rpc --allow-insecure-unlock --mine --minerthreads 1
 ##### Deploy smart contracts
 ```
 cd GRuB/btcrelay
-./deploy_contract.py contract/grub.sol
-./deploy_contract.py contract/offchain.sol
-./deploy_contract.py contract/onchain.sol
+./deploy_contract.py contracts/grub.sol
+./deploy_contract.py contracts/offchain.sol
+./deploy_contract.py contracts/onchain.sol
 ```
 
 ##### Run baseline of Offchain data placement (BL1)
@@ -68,4 +70,8 @@ This step may take long time due to heavy merkle-tree computation.
 ```
 python3.6 -m pip install web3
 python3.6 -m pip install py-solc
+```
+##### If it aware you that need /usr/bin/solc to be executable, use following commands
+```
+sudo chmod +x /usr/bin/solc
 ```
