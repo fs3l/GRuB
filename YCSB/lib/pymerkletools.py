@@ -36,11 +36,13 @@ class MerkleTools(object):
 
     def hash_leaf(self, value):
         v = Web3.soliditySha3(['string'], [value])
+        #v = Web3.soliditySha3(['int256'], [value])
         return v.hex()
  
     def hash_leaves(self, values):
         ret_values=[]
         for value in values:
+            #v = Web3.soliditySha3(['int256'], [value])
             v = Web3.soliditySha3(['string'], [value])
             ret_values.append(v.hex())
         return ret_values
@@ -52,20 +54,39 @@ class MerkleTools(object):
             values = [values]
         for v in values:
             if do_hash:
+                 #v = Web3.soliditySha3(['int256'], [v]).hex()
                  v = Web3.soliditySha3(['string'], [v]).hex()
             self.leaves.append(v)
-
-    def update_leaves(self, keys, values):
+ 
+    def update_leaves(self, keys, values, do_hash=True):
         for i in range(len(keys)):
-            self.leaves[self.map_key_indices[keys[i]]] = Web3.soliditySha3(['string'], [values[i]]).hex()
+            if keys[i] in self.map_key_indices:
+                self.leaves[self.map_key_indices[keys[i]]] = self.hash_leaf(values[i])
+            else:
+                self.insert_leaf(keys[i], values[i], do_hash)
         self.make_tree()
 
-    def insert_leaves(self, keys, values):
+    def insert_leaf(self, key, value, do_hash=True):
+        if key not in self.map_key_indices:
+            self.map_key_indices[key] = self.get_leaf_count()
+            if do_hash:
+                self.map_key_values[key] = self.hash_leaf(value)
+                self.leaves.append(self.hash_leaf(value))
+            else:
+                self.map_key_values[key] = value
+                self.leaves.append(self.hash_leaf(value))
+   
+    def insert_leaves(self, keys, values, do_hash=True):
         for i in range(len(keys)):
-            if keys[i] not in map_key_indices:
+            if keys[i] not in self.map_key_indices:
                 self.map_key_indices[keys[i]] = self.get_leaf_count()
-                self.map_key_values[keys[i]] = self.hash_leaf(values[i])
-                self.leaves.append(self.hash_leaf(values[i]))
+                if do_hash:
+                    self.map_key_values[keys[i]] = self.hash_leaf(values[i])
+                    self.leaves.append(self.hash_leaf(values[i]))
+                else:
+                    self.map_key_values[keys[i]] = values[i]
+                    self.leaves.append(self.hash_leaf(values[i]))
+                    #self.leaves.append(values[i])
         self.make_tree()
 
     def get_leaf(self, index):
@@ -102,9 +123,23 @@ class MerkleTools(object):
     def get_all_keys(self):
         return self.map_key_indices.keys()
 
-    def get_indices_by_keys(self, keys):
-        return list(self.map_key_indices[key] for key in keys)
+    def get_values(self, key):
+        if key in self.map_key_values:
+            return self.map_key_values[key]
+        return 0 
 
+    def get_indices_by_keys(self, keys):
+        rets = list()
+        for key in keys:
+            if key in self.map_key_indices:
+                rets.append(self.map_key_indices[key]) 
+        return rets
+
+    def get_indices_by_key(self, key):
+        if key in self.map_key_indices:
+            return self.map_key_indices[key]
+        return None 
+ 
     def get_key_indices_map(self):
         return self.map_key_indices
 
@@ -120,12 +155,6 @@ class MerkleTools(object):
                 return self.levels[0][0]
             else:
                 return None
-        else:
-            return None
-
-    def get_root(self):
-        if self.levels is not None:
-            return self.levels[0][0]
         else:
             return None
 
@@ -160,31 +189,6 @@ class MerkleTools(object):
             proof = list(dict.fromkeys(proof))
             print('proof length:',len(proof))
             return proof
-
-    def get_proof(self, index):
-        if self.levels is None:
-            return None
-        elif not self.is_ready or index > len(self.leaves)-1 or index < 0:
-            print(self.is_ready, index, len(self.leaves)-1)
-            return None
-        else:
-            proof = []
-            indices = []
-            for x in range(len(self.levels) - 1, 0, -1):
-                level_len = len(self.levels[x])
-                if (index == level_len - 1) and (level_len % 2 == 1):  # skip if this is an odd end node
-                    index = int(index / 2.)
-                    continue
-                is_right_node = index % 2
-                sibling_index = index - 1 if is_right_node else index + 1
-                sibling_pos = "left" if is_right_node else "right"
-                #sibling_value = self._to_hex(self.levels[x][sibling_index])
-                sibling_value = self.levels[x][sibling_index]
-                #proof.append({sibling_pos: sibling_value})
-                indices.append(sibling_index)
-                proof.append(sibling_value)
-                index = int(index / 2.)
-            return indices,proof
 
     def validate_proof(self, proof, target_hash, merkle_root):
         merkle_root = bytearray.fromhex(merkle_root)

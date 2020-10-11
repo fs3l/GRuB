@@ -1,4 +1,0 @@
-driver_memoryless.py:
-	-- miss a log called "leafs_Log"
-Other 3 drivers:
-	-- miss sol file called "Never_Replicate.sol", "Always_Replicate.sol", "OffChain_Rational.sol"

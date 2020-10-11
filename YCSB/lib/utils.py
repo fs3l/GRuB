@@ -53,14 +53,15 @@ def process(logfile, loading_len, max_range):
 
     for i in range(loading_len, len(LOG), 1):
         record_items = LOG[i].strip('\n').split(' ')
-        record = []
-        record.append(record_items[0])  # op_type
-        record.append(record_items[2])  # key
-        record.append(record_items[3])  # recordcount for scan operation
-        record.append(record_items[4])  # value
-        Batches, ReadBatch, WriteBatch, WriteBatchKeys = partition(record, Batches, max_range, ReadBatch, WriteBatch, WriteBatchKeys)
+        if len(record_items) > 4:
+            record = []
+            record.append(record_items[0])  # op_type
+            record.append(record_items[2])  # key
+            record.append(record_items[3])  # recordcount for scan operation
+            record.append(record_items[4])  # value
+            Batches, ReadBatch, WriteBatch, WriteBatchKeys = partition(record, Batches, max_range, ReadBatch, WriteBatch, WriteBatchKeys)
 
-    # collect the last batch if any 
+    # collect the last batch if not empty 
     if len(WriteBatch) > 0:
         Batches.append(WriteBatch)
     if len(ReadBatch) > 0:
@@ -79,6 +80,7 @@ def partition(record, Batches, BatchSize, ReadBatch, WriteBatch, WriteBatchKeys)
     op_type = record[0]
     key = record[1]
     value = record[3]
+    '''
     if op_type == 'READ':
         item = []
         item.append(op_type)
@@ -88,8 +90,9 @@ def partition(record, Batches, BatchSize, ReadBatch, WriteBatch, WriteBatchKeys)
             print ("Read batch size:",len(ReadBatch))
             Batches.append(ReadBatch)
             ReadBatch=[]
-
     elif op_type == 'SCAN':
+    '''
+    if op_type == 'SCAN' or op_type == 'READ':
         item = []
         item.append(op_type)
         item.append(key)
@@ -101,7 +104,31 @@ def partition(record, Batches, BatchSize, ReadBatch, WriteBatch, WriteBatchKeys)
         ReadBatch.append(item)
         Batches.append(ReadBatch)
         ReadBatch=[]
-
+    elif op_type == 'UPDATE' or op_type == 'INSERT':
+        item = []
+        item.append(op_type)
+        item.append(key)
+        item.append(record[2])
+        if key in ReadBatch:  # a read happens before the write
+            #print ("Read batch size:",len(ReadBatch))
+            Batches.append(ReadBatch)
+            ReadBatch=[]
+        if key in WriteBatchKeys:
+            Batches.append(WriteBatch)
+            #print ("Write batch size:",len(WriteBatch))
+            WriteBatch=[]
+            WriteBatchKeys=[]
+            WriteBatch.append(item)
+            WriteBatchKeys.append(key)
+        else:
+            WriteBatch.append(item)
+            WriteBatchKeys.append(key)
+            if len(WriteBatch) >= BatchSize:
+                print ("Write batch size:",len(WriteBatch))
+                Batches.append(WriteBatch)
+                WriteBatch=[]
+                WriteBatchKeys=[]
+    '''
     else:
         item = []
         item.append(op_type)
@@ -114,10 +141,10 @@ def partition(record, Batches, BatchSize, ReadBatch, WriteBatch, WriteBatchKeys)
         WriteBatch.append(item)
 
         # Batch multiple write         
-        if len(WriteBatch) >= BatchSize:
-            Batches.append(WriteBatch)
-            WriteBatch=[]
-
+        #if len(WriteBatch) >= BatchSize:
+        Batches.append(WriteBatch)
+        WriteBatch=[]
+'''
     return Batches, ReadBatch, WriteBatch, WriteBatchKeys
 
 def process_scan(batch, map_key_indices, map_key_values):
@@ -129,9 +156,9 @@ def process_scan(batch, map_key_indices, map_key_values):
 
     for item in batch:
         key = item[1]
-        record_count = int(item[2]) 
+        scan_len = int(item[2]) 
         index = map_key_indices[key]
-        for i in range(index, index+record_count):
+        for i in range(index, index+scan_len):
             if i in indices_list:
                 key = list(map_key_indices.keys())[list(map_key_indices.values()).index(i)]
                 value = map_key_values[key]
@@ -140,37 +167,58 @@ def process_scan(batch, map_key_indices, map_key_values):
                 #print('index:',i,'key:',key, 'value:',value)
     return ret_keys, ret_values
 
+def get_domain_name(cert):
+    if cert.find('Subject: ') > 0:
+        domain_name = cert.strip('\n').split('Subject: ')[1].split('CN = ')[1].split(' ')[0]
+        return domain_name
 
-def get_writes(logfile, offset, max_range):
-    num=0
-    ret=[]
-    LOG = open(logfile,"r").readlines()
-    for i in range(offset, len(LOG), 1):
-        items = LOG[i].strip('\n').split(' ')
-        if  items[0] == 'UPDATE':
-            ret.append(items[2])
-            num += 1
-            if num >= max_range:
-                break
-    return ret
+def process_certs(cert_file):
+    ret_domain_names=[]
+    ret_certs=[]
+    certs = open(cert_file).readlines()
+    for record in certs:
+        record_items = record.strip('\n').split(',')
+        domain_name = record_items[4]
+        cert = record_items[3]
 
-def get_reads(logfile, offset, max_range):
-    num=0
-    ret=[]
-    LOG = open(logfile,"r").readlines()
-    for i in range(offset, len(LOG), 1):
-        items = LOG[i].strip('\n').split(' ')
-        if  items[0] == 'READ' or items[0] == 'SCAN':
-            #record = []
-            #record.append(items[2])
-            #record.append(items[3])
-            #ret.append(record)
-            ret.append(items[2])
-            num += 1
-            if num >= max_range:
-                break
-    return ret
+        if domain_name and domain_name not in ret_domain_names:
+            ret_domain_names.append(domain_name)
+            ret_certs.append(cert)
 
+    return ret_domain_names, ret_certs
+
+def process_token_transfer(token_tx_file, loading_state, batch_size=50):
+    batch=[]
+    batches=[]
+    non_batches=[]
+    pass_receivers=[]
+    receivers=[]
+    txs = open(token_tx_file).readlines()
+    for tx in txs:
+        record=[]
+        record_items = tx.strip('\n').split(',')
+        if record_items[4] == 'transfer':
+            sender = record_items[3]
+            receiver = '0x' + record_items[5][24:]
+
+            #print(record_items[6])
+            amounts = int(int(record_items[6],16)/1000000000000000)
+            record=[sender, receiver, amounts]
+            receivers.append(receiver)
+          
+            if sender not in pass_receivers and sender not in loading_state: 
+                batches.append(batch)
+                pass_receivers += receivers
+                batch = []
+                receivers=[]
+            if len(batch) > batch_size:
+                batches.append(batch)
+                pass_receivers += receivers
+                batch = []
+                receivers=[]
+            batch.append(record)
+            non_batches.append(record)
+    return batches, non_batches
 '''
 def partition(record, Batches, BatchSize, ReadBatch, WriteBatch, WriteBatchKeys):
     op_type = record[0]
