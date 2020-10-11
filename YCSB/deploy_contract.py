@@ -1,7 +1,7 @@
 #! /usr/bin/python3.6
 import sys
 
-from lib.private_net import PrivateSmartContract
+from lib.private_bkc import PrivateSmartContract
 
 ##################
 ###### main ######

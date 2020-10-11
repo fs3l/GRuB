@@ -39,31 +39,16 @@ geth --datadir "geth_data" --rpc --allow-insecure-unlock --mine --minerthreads 1
 ```
 
 ### Test BtcRelay trace (start a new terminal)
-##### Deploy smart contracts
 ```
-cd GRuB/btcrelay
-./deploy_contract.py contracts/grub.sol
-./deploy_contract.py contracts/offchain.sol
-./deploy_contract.py contracts/onchain.sol
+cd btcrelay/
 ```
+Then follow the README.md in btcrelay folder
 
-##### Run baseline of Offchain data placement (BL1)
+### Test YCSB trace (strat a new terminal)
 ```
-./driver_offchain.py 10 1 trace/subtrace_1.data
-``` 
-Parameter `10` is the `batch size`, you can use any other values other than 10.
-
-This step may take long time due to heavy merkle-tree computation.
-
-##### Run baseline of Onchain data placement (BL2)
+cd YCSB/
 ```
-./driver_onchain.py 10 1 trace/subtrace_1.data
-```
-
-##### Run GRuB
-```
-./driver_memoryless.py 10 1 trace/subtrace_1.data 0
-```
+Then follow the README.md in YCSB folder
 
 ### Trouble-shooting
 ##### If you have multiple python3 versions, use the following commands to install Web3 and pysolc packages
