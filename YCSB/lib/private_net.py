@@ -1,6 +1,6 @@
 #! /usr/bin/python3.6
 
-import json,sys, re
+import json,sys
 import web3
 
 from web3 import Web3
@@ -32,9 +32,6 @@ class PrivateSmartContract(object):
             contract_source_code = source_code.read()
 
         contract_name = contract_source_code.strip('\n').split('{')[0].split('contract ')[1].strip()
-
-        #contract_name=re.findall( r'contract (.*) [is]+', contract_source_code)[0]
-        #contract_name = contract_source_code.strip('\n').split('contract ')[1].strip()
         print ('deploying '+ contract_name + '...')
 
         compiled_sol = compile_source(contract_source_code) # Compiled source code
@@ -56,11 +53,10 @@ class PrivateSmartContract(object):
     def get_contract_instance(self, source_code_file, txLogFile, K=0):
     
         # Get the deployed contract address 
-        contract_address_file = source_code_file.split('.sol')[0] + '.address' + str(self.account_index)
+        contract_address_file = source_code_file.split('.sol')[0] + '.address' + str(K)
         with open(source_code_file, 'r') as source_code:
             contract_source_code = source_code.read()
-        contract_name=re.findall( r'contract (.*) [is]+', contract_source_code)[0]
-        #contract_name = contract_source_code.strip('\n').split('{')[0].split('contract ')[1].strip() 
+        contract_name = contract_source_code.strip('\n').split('{')[0].split('contract ')[1].strip() 
 
         # Get compiled source code
         compiled_sol = compile_source(contract_source_code) 
@@ -118,14 +114,14 @@ class PrivateSmartContract(object):
                                                                                                                             
         elif function_index == 1: # write
             print ('poke..') 
-            return self.contractInstance.functions.gPut(*arguments).transact()                                                                                                                             
-        elif function_index == 2: # deposit 
+            return self.contractInstance.functions.poke(*arguments).transact()                                                                                                                             
+        elif function_index == 2: # read_offchain 
             print ('deposit...') 
-            return self.contractInstance.functions.issue(*arguments).transact({"value":100000})
+            return self.contractInstance.functions.deposit(*arguments).transact({"value":100000})
 
         elif function_index == 3: # deposit 
             print ('deposit...') 
-            return self.contractInstance.functions.issue(*arguments).transact({"value":100000})
+            return self.contractInstance.functions.deposit(*arguments).transact({"value":100000})
 
         elif function_index == 4: # write_1
             print ('write_1...') 
@@ -153,7 +149,7 @@ class PrivateSmartContract(object):
             print ('read_offchain ....') 
             return self.contractInstance.functions.read_offchain(*arguments).transact()
 
-    def send_transactions(self, contract_name, function_index, arguments, batchSize, RW='default'):
+    def send_transactions(self, contract_name, function_index, arguments, batchSize, RW='default', waitInclusion=False):
         w3 = self.w3
 
         if contract_name == 'GRuB':  
@@ -165,14 +161,17 @@ class PrivateSmartContract(object):
 
         # Wait for transaction to be mined...
         print("tx",tx_hash.hex())
-        w3.eth.waitForTransactionReceipt(tx_hash, 20*60)
-        receipt = w3.eth.getTransactionReceipt(tx_hash)
         #print(receipt)
         with open(self.txLogFile, 'a') as TXLOG: 
             try:
-                print ('blockNumber:', receipt['blockNumber'], 'gasUsed:', receipt['gasUsed'])
+                if waitInclusion:
+                    w3.eth.waitForTransactionReceipt(tx_hash, 20*60)
+                    receipt = w3.eth.getTransactionReceipt(tx_hash)
+                    print ('blockNumber:', receipt['blockNumber'], 'gasUsed:', receipt['gasUsed'])
                 # write to the log file
-                TXLOG.write(tx_hash.hex() + '\t' + str(receipt['blockNumber'])  + '\t' + str(receipt['gasUsed']) + '\t' +str(batchSize) +'\t' + RW + '\r\n')
+                    TXLOG.write(tx_hash.hex() + '\t' + str(receipt['blockNumber'])  + '\t' + str(receipt['gasUsed']) + '\t' +str(batchSize) +'\t' + RW + '\r\n')
+                else:
+                    TXLOG.write(tx_hash.hex() + '\t\t\t'+ str(batchSize) + '\t' + RW + '\n') 
             except:
                 print (receipt)
                 TXLOG.write(tx_hash.hex() + '\t\t\t'+ str(batchSize) + '\t' + RW + '\tERR\n')

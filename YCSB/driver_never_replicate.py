@@ -4,8 +4,8 @@ import pickle
 
 from lib.utils import process, process_scan, order_by_decision, trim_by_decision
 from lib.pymerkletools import MerkleTools 
-from lib.public_bkc import PublicSmartContract
-from lib.private_bkc import PrivateSmartContract
+#from lib.public_bkc import PublicSmartContract
+from lib.private_net import PrivateSmartContract
 
 ##################
 ###### main ######
