@@ -10,7 +10,7 @@
 ```
 ./driver_offchain.py ycsb_trace/workloada.Log 65535 10 1
 ``` 
-The first parameter `65535` is the `KV count` in the trace while the second parameter `10` is the `batch size`, you can use any other values other than 10. Parameter `ycsb_trace/workloadg.Log` is the `testing trace`, you can use other traces in `ycsb_trace` folder.
+The first parameter `ycsb_trace/workloadg.Log` is the testing trace, the second parameter `65535` is the `KV count` in the trace while the third parameter `10` is the `batch size`, you can use any other values other than 10. You can use other traces in the `ycsb_trace` folder.
 
 This step may take long time due to heavy merkle-tree computation.
 

@@ -10,7 +10,7 @@
 ```
 ./driver_offchain.py 10 1 16 trace/ether_2018_0425_0430_RW.data
 ``` 
-The first parameter `10` is the `batch size` while the second parameter `16` is the `Merkle Tree Depth`.
+The first parameter `10` is the `batch size` while the third parameter `16` is the `Merkle Tree Depth`.
 
 This step may take long time due to heavy merkle-tree computation.
 
