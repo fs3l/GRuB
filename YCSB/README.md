@@ -14,7 +14,7 @@
 ```
 ./driver_offchain.py ycsb_trace/workloadg.Log 10 10 1
 ``` 
-The first parameter `10` is the `batch size` while the second parameter '10' is the 'loading range', you can use any other values other than 10. Parameter "ycsb_trace/workloadg.Log" is the test data, you can use any file in ycsb_trace.
+The first parameter `10` is the `batch size` while the second parameter `10` is the `loading range`, you can use any other values other than 10. Parameter `ycsb_trace/workloadg.Log` is the `test data`, you can use any file in `ycsb_trace`.
 
 This step may take long time due to heavy merkle-tree computation.
 
