@@ -12,7 +12,7 @@ class PrivateSmartContract(object):
         self.get_web3_instance(account_index)
 
     def get_web3_instance(self, account_index):
-        self.rpcUrl = "http://127.0.0.1:8545"
+        self.rpcUrl = "http://127.0.0.1:18541"
         # web3.py instance
         self.w3 = Web3(Web3.HTTPProvider(self.rpcUrl))
 
@@ -31,9 +31,7 @@ class PrivateSmartContract(object):
         with open(source_code_file, 'r') as source_code:
             contract_source_code = source_code.read()
 
-        contract_name = contract_source_code.strip('\n').split('{')[0].split('contract ')[1].strip()
-
-        #contract_name=re.findall( r'contract (.*) [is]+', contract_source_code)[0]
+        contract_name=re.findall( r'contract (.*)[is]?[{]+', contract_source_code)[0]
         #contract_name = contract_source_code.strip('\n').split('contract ')[1].strip()
         print ('deploying '+ contract_name + '...')
 
@@ -53,13 +51,13 @@ class PrivateSmartContract(object):
         with open(contract_address_file, 'w') as caf:
             caf.write(tx_receipt.contractAddress)
 
-    def get_contract_instance(self, source_code_file, txLogFile, K=0):
+    def get_contract_instance(self, source_code_file, txLogFile):
     
         # Get the deployed contract address 
         contract_address_file = source_code_file.split('.sol')[0] + '.address' + str(self.account_index)
         with open(source_code_file, 'r') as source_code:
             contract_source_code = source_code.read()
-        contract_name=re.findall( r'contract (.*) [is]+', contract_source_code)[0]
+        contract_name=re.findall( r'contract (.*)[is]?[{]+', contract_source_code)[0]
         #contract_name = contract_source_code.strip('\n').split('{')[0].split('contract ')[1].strip() 
 
         # Get compiled source code
@@ -153,7 +151,7 @@ class PrivateSmartContract(object):
             print ('read_offchain ....') 
             return self.contractInstance.functions.read_offchain(*arguments).transact()
 
-    def send_transactions(self, contract_name, function_index, arguments, batchSize, RW='default'):
+    def send_transactions(self, contract_name, function_index, arguments, batchSize, RW='default', waitInclusion=False):
         w3 = self.w3
 
         if contract_name == 'GRuB':  
@@ -163,16 +161,19 @@ class PrivateSmartContract(object):
         elif contract_name == 'StableCoin':  
             tx_hash = self.call_StableCoin(function_index, arguments)
 
-        # Wait for transaction to be mined...
         print("tx",tx_hash.hex())
-        w3.eth.waitForTransactionReceipt(tx_hash, 20*60)
-        receipt = w3.eth.getTransactionReceipt(tx_hash)
+        # Wait for transaction to be mined...
         #print(receipt)
         with open(self.txLogFile, 'a') as TXLOG: 
             try:
-                print ('blockNumber:', receipt['blockNumber'], 'gasUsed:', receipt['gasUsed'])
+                if waitInclusion:
+                    w3.eth.waitForTransactionReceipt(tx_hash, 20*60)
+                    receipt = w3.eth.getTransactionReceipt(tx_hash)
+                    print ('blockNumber:', receipt['blockNumber'], 'gasUsed:', receipt['gasUsed'])
                 # write to the log file
-                TXLOG.write(tx_hash.hex() + '\t' + str(receipt['blockNumber'])  + '\t' + str(receipt['gasUsed']) + '\t' +str(batchSize) +'\t' + RW + '\r\n')
+                    TXLOG.write(tx_hash.hex() + '\t' + str(receipt['blockNumber'])  + '\t' + str(receipt['gasUsed']) + '\t' +str(batchSize) +'\t' + RW + '\r\n')
+                else:
+                    TXLOG.write(tx_hash.hex() + '\t\t\t'+ str(batchSize) + '\t' + RW + '\n') 
             except:
                 print (receipt)
                 TXLOG.write(tx_hash.hex() + '\t\t\t'+ str(batchSize) + '\t' + RW + '\tERR\n')
