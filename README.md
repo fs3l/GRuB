@@ -50,6 +50,12 @@ cd YCSB/
 ```
 Then follow the README.md in YCSB folder
 
+### Test YCSB trace (strat a new terminal)
+```
+cd stableCoins/
+```
+Then follow the README.md in stableCoins folder
+
 ### Trouble-shooting
 ##### If you have multiple python3 versions, use the following commands to install Web3 and pysolc packages
 ```

@@ -12,7 +12,7 @@ class PrivateSmartContract(object):
         self.get_web3_instance(account_index)
 
     def get_web3_instance(self, account_index):
-        self.rpcUrl = "http://127.0.0.1:18541"
+        self.rpcUrl = "http://127.0.0.1:8545"
         # web3.py instance
         self.w3 = Web3(Web3.HTTPProvider(self.rpcUrl))
 

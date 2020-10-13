@@ -10,8 +10,8 @@ from lib.utils import partition_priceoracle
 ###### main ######
 ##################
 
-if (len(sys.argv) < 4 ):
-    print ("Usage: ./driver.py batch_size test_type (0: Loading, 1: Test) merkle_tree_depth account_index (default=0)")
+if (len(sys.argv) < 5 ):
+    print ("Usage: ./driver.py batch_size test_type (0: Loading, 1: Test) merkle_tree_depth trace_data account_index (default=0)")
     exit()
 
 batch_size = int(sys.argv[1])

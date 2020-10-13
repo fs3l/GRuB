@@ -11,8 +11,8 @@ from queue import Queue
 ###### main ######
 ##################
 
-if (len(sys.argv) < 3 ):
-    print ("Usage: ./driver.py batch_size test_type (0: Loading, 1: Test) depth account_index(default=0)")
+if (len(sys.argv) < 5 ):
+    print ("Usage: ./driver.py batch_size test_type (0: Loading, 1: Test) depth trace_data account_index(default=0)")
     exit()
 
 batch_size = int(sys.argv[1])
