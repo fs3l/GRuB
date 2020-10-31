@@ -62,7 +62,7 @@ Then follow the README.md in stableCoins folder
 python3.6 -m pip install web3
 python3.6 -m pip install py-solc
 ```
-##### If it aware you that need /usr/bin/solc to be executable, use following commands
+##### If it prompts you that /usr/bin/solc is not executable, add execution permission by the following command
 ```
 sudo chmod +x /usr/bin/solc
 ```
