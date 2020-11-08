@@ -44,13 +44,13 @@ cd btcrelay/
 ```
 Then follow the README.md in btcrelay folder
 
-### Test YCSB trace (strat a new terminal)
+### Test YCSB trace (start a new terminal)
 ```
 cd YCSB/
 ```
 Then follow the README.md in YCSB folder
 
-### Test YCSB trace (strat a new terminal)
+### Test YCSB trace (start a new terminal)
 ```
 cd stableCoins/
 ```
