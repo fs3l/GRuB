@@ -66,3 +66,19 @@ python3.6 -m pip install py-solc
 ```
 sudo chmod +x /usr/bin/solc
 ```
+
+Reference
+---
+
+If you use our dataset, please reference our paper published in Middleware 2020
+
+```
+@inproceedings{grub,
+ author    = {Kai Li and Yuzhe Tang and Jiaqi Chen and Zhehu Yuan and Cheng Xu and Jianliang Xu},
+ title     = {Cost-Effective Data Feeds to Blockchains via Workload-Adaptive Data Replication},
+ booktitle = {ACM/IFIP Middleware 2020},
+ howpublished = {\url{https://arxiv.org/abs/1911.04078}}
+}
+```
+
+
