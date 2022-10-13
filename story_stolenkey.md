@@ -1,9 +1,14 @@
-Theft report: Behind the scene of a ether theft by stolen key
+Report: Behind the scene of Ether theft from leaked keys
 ===
+
+Disclaim: While my Github ID is public, please treat this report as an anonymous report. 
+Contact me if you have a question: mous314anony@gmail.com .
 
 In this report, I want to document my recent incident where I lost $5$ Ether. My purpose is to raise awareness and show how quickly damage can be caused if you accidentally leak your Ethereum account keys (secret keys) to the public.
 
-Here goes my story: I usually use this Ethereum account (starting with $5ea8$) for test purposes. I sent transactions on Ropsten using the corresponding secret key (starting with $A175$) to test various Ethereum projects like this one. I hardcoded the secret key in the project and pushed it to this GitHub repository for convenience access (on 10/11/2020). Since the account is intended for use in testnets, for a long time (over 10 months), this practice of disclosing the secret key did not cause me trouble. 
+Here is my story: I usually use this Ethereum account (starting with $5ea8$) for test purposes. I sent transactions on Ropsten using the corresponding secret key (starting with $A175$) to test various Ethereum projects like this one. I hardcoded the secret key in the project and pushed it to this GitHub repository for convenience access (on 10/13/2020). Since the account is intended for use in testnets, for a long time (over 10 months), this practice of disclosing the secret key did not cause me trouble. 
+
+- My commit that leaks my secret key $A175$: https://github.com/fs3l/GRuB/commits/630922af7c88341c0d5fa6e009dcf819603716b9/stableCoins/lib/testnet.py 
 
 On 07/07/2021, I received an email from a reputable company, say ABC company (name marked). ABC wanted to acknowledge my prior technical work by rewarding me 5 Ether. I made a mistake by telling ABC my test account $5ea8$, and I forgot the fact that the secret key of this account is stored in this GitHub repository.
 
@@ -24,7 +29,7 @@ Here comes the surprise: Right after $tx1$, another transaction $tx2$ is sent fr
 
 Clearly, I did not send $tx2$. It took me a while to figure out what’s going on:
 
-Whoever holds account $f0f9$ is a thief. He must actively monitor public GitHub pages like this repository and looks for leaked secret keys. He must already know my leaked key long before the incident (leaked on 10/11/2020). But he did not do anything and waited until the 5-Ether deposit. 
+Whoever holds account $f0f9$ is a thief. He must actively monitor public GitHub pages like this repository and looks for leaked secret keys. He must already know my leaked key long before the incident (leaked on 10/13/2020). But he did not do anything and waited until the 5-Ether deposit. 
 
 After this incident, I immediately stopped using this test account on both mainnet and testnets. So until today, there are only three mainnet transactions related to my leaked account ( $52ea$ ).
 
